@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NatureAPI.Models.DTOs;
 using NatureAPI.Models.Entities;
+using OpenAI.Chat;
 
 namespace NatureAPI.Controllers
 {
@@ -11,10 +12,15 @@ namespace NatureAPI.Controllers
     public class PlacesController : ControllerBase
     {
         private readonly NatureDbContext _context;
+        private readonly IConfiguration _config;
 
-        public PlacesController(NatureDbContext context)
+        public PlacesController(
+            NatureDbContext context,
+            IConfiguration config
+            )
         {
             _context = context;
+            _config = config;
         }
         
         // GET /api/places?category=&difficulty=
@@ -215,6 +221,33 @@ namespace NatureAPI.Controllers
             };
 
             return CreatedAtAction(nameof(GetPlace), new { id = place.Id }, resultDto);
+        }
+
+        [HttpGet("resumePlace")]
+        public async Task<ActionResult> ResumePlace(
+            [FromQuery] string? nombre
+            )
+        {
+            // Obtener API KEY
+            var openAIKey = _config["OpenAIKey"];
+            var client = new ChatClient(
+                model: "gpt-5-mini",
+                apiKey: openAIKey
+            );
+            
+            // SE HACE EL PROMPT 
+            var prompt = Prompts.GetPlaceResume(nombre);
+            
+
+            // SE ENVIA A LA IA Y SE OBTIENE LA RESPUESTA
+            var result = await client.CompleteChatAsync(
+                new UserChatMessage(prompt)
+            );
+            
+            var response = result.Value.Content[0].Text;
+
+            // SE DEVUELVE LA RESPUESTA
+            return Ok(response);
         }
     }
 }
