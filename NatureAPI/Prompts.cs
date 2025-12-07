@@ -13,7 +13,8 @@ public static class Prompts
             y cualquier dato interesante que pueda atraer a visitantes.
             El resumen debe ser claro, informativo y atractivo para potenciales turistas.
             Utiliza un lenguaje accesible y evita tecnicismos innecesarios.
-            Ve el siguiente nombre del lugar {placeName}
+            Haz un resumen del siguiente lugar: {placeName}, toma en cuenta que esta en México
+            Y debes de ser capaz de resonder en español. Dame el resumen más extenso que puedas
 
             Debes responder **exclusivamente** en formato JSON y con esta estructura:
             {{
